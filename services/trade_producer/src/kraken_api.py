@@ -1,6 +1,8 @@
 from typing import List, Dict
 from websocket import create_connection
 import json
+from loguru import logger
+
 
 class KrakenApi:
     def __init__(
@@ -14,7 +16,7 @@ class KrakenApi:
         self._subscribe(product_id)
 
     def _subscribe(self, product_id: str):
-        print("Connection establised")
+        logger.info("Connection establised")
         msg = {
             "method": "subscribe",
             "params": {
@@ -31,7 +33,7 @@ class KrakenApi:
         # only for confirmation on their end that the connection is success
         _ = self._ws.recv()
         _ = self._ws.recv()
-        print("Subscription worked")
+        logger.info("Subscription worked")
 
     def get_trades(self) -> List[Dict]:
         msg = self._ws.recv()
