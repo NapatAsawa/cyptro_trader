@@ -7,8 +7,7 @@ from loguru import logger
 class KrakenApi:
     def __init__(
         self,
-        product_id: str,
-
+        product_id: str
     ):
         self.url = 'wss://ws.kraken.com/v2'
         self.product_id = product_id 
@@ -16,6 +15,9 @@ class KrakenApi:
         self._subscribe(product_id)
 
     def _subscribe(self, product_id: str):
+        """
+        Establish connection to the Kraken websocket API and subscribe to the trades for the given `product_id`.
+        """
         logger.info("Connection establised")
         msg = {
             "method": "subscribe",
@@ -36,6 +38,9 @@ class KrakenApi:
         logger.info("Subscription worked")
 
     def get_trades(self) -> List[Dict]:
+        """
+        Fetches trade data from the Kraken Websocket API and returns a list of Trades.
+        """
         msg = self._ws.recv()
         if 'heartbeat' in msg:
             return []
