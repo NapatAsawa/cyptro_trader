@@ -1,6 +1,7 @@
 from quixstreams import Application
 from loguru import logger
 from src.kraken_api import KrakenApi
+from src import config
 
 def produce_trades(
         kafka_broker_address: str,
@@ -9,7 +10,7 @@ def produce_trades(
 
     app = Application(broker_address=kafka_broker_address)
     topic = app.topic(name = kafka_topic, value_deserializer='json')
-    karken_api = KrakenApi(product_id= "BTC/USD")
+    karken_api = KrakenApi(product_id= config.product_id)
     with app.get_producer() as producer:
         while True:
             trades = karken_api.get_trades()
@@ -28,7 +29,7 @@ def produce_trades(
 if __name__ == '__main__':
     produce_trades(
         #kafka_broker_address = "localhost:19092",
-        kafka_broker_address = "redpanda-0:9092",
-        kafka_topic = "trades"
+        kafka_broker_address = config.kafka_broker_address,
+        kafka_topic = config.kafka_topic
     )
 
