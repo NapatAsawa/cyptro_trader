@@ -51,3 +51,5 @@ setup-ec2-prod.sh
 __pycache__/
 .DS_Store
 set_environment_variables.sh
+
+**/state

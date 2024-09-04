@@ -1,6 +1,38 @@
+from datetime import timedelta
 from quixstreams import Application
 from src import config
 from loguru import logger
+
+def init_ohlc_candle(value: dict) -> dict:
+        """
+        Initialize the OHLC candle with the first trade
+        """
+        return {
+            'open': value['price'],
+            'high': value['price'],
+            'low': value['price'],
+            'close': value['price'],
+            'product_id': value['product_id']
+        }
+
+def update_ohlc_candle(ohlc_candle: dict, trade: dict) -> dict:
+    """
+    Update the OHLC candle with the new trade and return the updated candle
+
+    Args:
+        ohlc_candle : dict : The current OHLC candle
+        trade : dict : The incoming trade
+
+    Returns:
+        dict : The updated OHLC candle
+    """
+    return {
+        'open': ohlc_candle['open'],
+        'high': max(ohlc_candle['high'], trade['price']),
+        'low': min(ohlc_candle['low'], trade['price']),
+        'close': trade['price'],
+        'product_id': trade['product_id']
+    }
 
 def trade_to_ohlc(
         kafka_input_topic: str,
@@ -26,13 +58,25 @@ def trade_to_ohlc(
     """
     app = Application(
         broker_address=kafka_broker_address,
-        consumer_group="trade_to_ohlc"
+        consumer_group="trade_to_ohlc",
+        #auto_offset_reset="earliest" #process all data
+        auto_offset_reset="latest" #process only latest data
     )
 
     input_topic = app.topic(name = kafka_input_topic, value_deserializer='json')
     output_topic = app.topic(name = kafka_output_topic, value_deserializer='json')
 
     sdf = app.dataframe(input_topic)
+    sdf = sdf.tumbling_window(duration_ms=timedelta(seconds=ohlc_window_seconds))
+    sdf = sdf.reduce(reducer=update_ohlc_candle, initializer=init_ohlc_candle).final()
+
+    sdf['open'] = sdf['value']['open']
+    sdf['high'] = sdf['value']['high']
+    sdf['low'] = sdf['value']['low']
+    sdf['close'] = sdf['value']['close']
+    sdf['product_id'] = sdf['value']['product_id']
+    sdf['timestamp'] = sdf['end']
+    sdf = sdf[['timestamp', 'open', 'high', 'low', 'close', 'product_id']]
 
     sdf = sdf.update(logger.info)
 
