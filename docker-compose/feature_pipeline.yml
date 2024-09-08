@@ -1,0 +1,27 @@
+version: "3.7"
+name: feature_pipeline
+networks:
+  redpanda_network:
+    name: redpanda_network
+    driver: bridge
+services:
+  trade_producer:
+    build:
+      context: ../services/trade_producer
+    networks:
+      - redpanda_network
+    
+  trade_to_ohlc:
+    build:
+      context: ../services/trade_to_ohlc
+    networks:
+      - redpanda_network
+
+  kafka_to_feature_store:
+    container_name: kafka_to_feature_store
+    build:
+      context: ../services/kafka_to_feature_store
+    networks:
+      - redpanda_network
+    env_file:
+      - ../services/kafka_to_feature_store/.env

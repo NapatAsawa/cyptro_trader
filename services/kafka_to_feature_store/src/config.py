@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv, find_dotenv
+# load env from .env
+load_dotenv(find_dotenv())
 kafka_broker_address = "redpanda-0:9092"
 #kafka_broker_address = "localhost:19092"
 kafka_topic="ohlc"
