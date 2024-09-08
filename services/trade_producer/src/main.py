@@ -47,7 +47,7 @@ def produce_trades(
                     key=message.key,
                     value=message.value,
                 )
-                logger.info(message.value)
+                #logger.info(message.value)
             
 
 if __name__ == '__main__':

@@ -33,6 +33,22 @@ def update_ohlc_candle(ohlc_candle: dict, trade: dict) -> dict:
         'close': trade['price'],
         'product_id': trade['product_id']
     }
+def custom_ts_extractor(
+    value,
+    headers,
+    timestamp: float,
+    timestamp_type,  #: TimestampType,
+) -> int:
+    """
+    Specifying a custom timestamp extractor to use the timestamp from the message payload
+    instead of Kafka timestamp.
+
+    We want to use the `timestamp_ms` field from the message value.
+    
+    See the Quix Streams documentation here
+    https://quix.io/docs/quix-streams/windowing.html#extracting-timestamps-from-messages
+    """
+    return value['timestamp_ms']
 
 def trade_to_ohlc(
         kafka_input_topic: str,
@@ -58,12 +74,12 @@ def trade_to_ohlc(
     """
     app = Application(
         broker_address=kafka_broker_address,
-        consumer_group="trade_to_ohlc",
-        #auto_offset_reset="earliest" #process all data
-        auto_offset_reset="latest" #process only latest data
+        consumer_group=kafka_consumer_group,
+        auto_offset_reset="earliest" #process all data
+        #auto_offset_reset="latest" #process only latest data
     )
 
-    input_topic = app.topic(name = kafka_input_topic, value_deserializer='json')
+    input_topic = app.topic(name = kafka_input_topic,  timestamp_extractor=custom_ts_extractor, value_deserializer='json')
     output_topic = app.topic(name = kafka_output_topic, value_deserializer='json')
 
     sdf = app.dataframe(input_topic)
