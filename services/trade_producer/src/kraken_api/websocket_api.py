@@ -4,7 +4,7 @@ import json
 from loguru import logger
 
 
-class KrakenApi:
+class KrakenWebSocketApi:
     def __init__(
         self,
         product_id: str
@@ -52,7 +52,10 @@ class KrakenApi:
                     'product_id': self.product_id,
                     'price': trade['price'],
                     'volume': trade['qty'],
-                    'timestamp': trade['timestamp']
+                    'timestamp_ms': trade['timestamp']
                 }
             )
         return trades
+    
+    def is_done(self) -> bool:
+        return False
