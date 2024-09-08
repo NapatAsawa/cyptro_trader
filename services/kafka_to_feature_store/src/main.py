@@ -32,8 +32,8 @@ def kafka_to_feature_store(
     app = Application(
         broker_address=kafka_broker_address,
         consumer_group=kafka_consumer_group,
-        auto_offset_reset="earliest" #process all data
-        #auto_offset_reset="latest" #process only latest data
+        #auto_offset_reset="earliest" #process all data
+        auto_offset_reset="latest" #process only latest data
     )
 
     with app.get_consumer() as consumer:

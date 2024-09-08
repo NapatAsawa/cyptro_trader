@@ -75,8 +75,8 @@ def trade_to_ohlc(
     app = Application(
         broker_address=kafka_broker_address,
         consumer_group=kafka_consumer_group,
-        auto_offset_reset="earliest" #process all data
-        #auto_offset_reset="latest" #process only latest data
+        #auto_offset_reset="earliest" #process all data
+        auto_offset_reset="latest" #process only latest data
     )
 
     input_topic = app.topic(name = kafka_input_topic,  timestamp_extractor=custom_ts_extractor, value_deserializer='json')
