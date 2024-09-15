@@ -2,6 +2,8 @@ import requests
 from typing import Optional, Tuple
 import json
 from datetime import datetime, timezone
+from loguru import logger
+from time import sleep
 class KrakenRestApi:
     def __init__(
         self,
@@ -53,7 +55,9 @@ class KrakenRestApi:
             data = json.loads(response.text)
         except:
             raise Exception(request_url)
-        #TO DO check error in response
+        if ('error' in data) and ('EGeneral:Too many requests' in data['error']):
+                logger.info('Too many requests. Sleeping for 30 seconds')
+                sleep(30)
         trades = [
                 {
                     'product_id':self.product_id,

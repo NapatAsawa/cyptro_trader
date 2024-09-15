@@ -2,6 +2,8 @@ from typing import List, Dict
 from websocket import create_connection
 import json
 from loguru import logger
+from datetime import datetime, timezone
+from dateutil import parser
 
 
 class KrakenWebSocketApi:
@@ -47,12 +49,13 @@ class KrakenWebSocketApi:
         msg = json.loads(msg)
         trades = []
         for trade in msg['data']:
+            timestamp = parser.isoparse(trade['timestamp']) 
             trades.append(
                 {
                     'product_id': self.product_id,
                     'price': trade['price'],
                     'volume': trade['qty'],
-                    'timestamp_ms': trade['timestamp']
+                    'timestamp_ms': int(timestamp.timestamp() * 1000)
                 }
             )
         return trades

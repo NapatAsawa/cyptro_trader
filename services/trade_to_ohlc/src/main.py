@@ -79,7 +79,10 @@ def trade_to_ohlc(
         auto_offset_reset="latest" #process only latest data
     )
 
-    input_topic = app.topic(name = kafka_input_topic,  timestamp_extractor=custom_ts_extractor, value_deserializer='json')
+    input_topic = app.topic(
+         name = kafka_input_topic,  
+         timestamp_extractor=custom_ts_extractor, 
+         value_deserializer='json')
     output_topic = app.topic(name = kafka_output_topic, value_deserializer='json')
 
     sdf = app.dataframe(input_topic)
@@ -94,7 +97,7 @@ def trade_to_ohlc(
     sdf['timestamp'] = sdf['end']
     sdf = sdf[['timestamp', 'open', 'high', 'low', 'close', 'product_id']]
 
-    sdf = sdf.update(logger.info)
+    #sdf = sdf.update(logger.info)
 
     sdf = sdf.to_topic(output_topic)
     app.run(sdf)

@@ -1,6 +1,6 @@
-kafka_broker_address = "redpanda-0:9092"
-#kafka_broker_address = "localhost:19092"
+import os
+live_or_historical = os.environ["LIVE_OR_HISTORICAL"]
+kafka_broker_address = os.environ["KAFKA_BROKER_ADDRESS"]
 kafka_topic = "trades"
 product_id= "BTC/USD"
-live_or_historical = "historical"
 last_n_days = 1

@@ -25,7 +25,6 @@ def produce_trades(
     """
     app = Application(broker_address=kafka_broker_address)
     topic = app.topic(name = kafka_topic, value_deserializer='json')
-
     if live_or_historical == 'live':
         kraken_api = KrakenWebSocketApi(product_id= product_id)
     elif live_or_historical == 'historical':
@@ -45,7 +44,7 @@ def produce_trades(
                 producer.produce(
                     topic=topic.name,
                     key=message.key,
-                    value=message.value,
+                    value=message.value
                 )
                 #logger.info(message.value)
             
